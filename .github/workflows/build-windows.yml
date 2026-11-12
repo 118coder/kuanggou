@@ -37,6 +37,9 @@ jobs:
             Copy-Item "C:\ProgramData\chocolatey\bin\x86_64-w64-mingw32-windres.exe" "C:\ProgramData\chocolatey\bin\windres.exe" -Force
           }
 
+      - name: 单元测试
+        run: cargo test
+
       - name: 编译 release
         run: cargo build --release
 

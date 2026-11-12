@@ -149,7 +149,8 @@ pub fn gif_alpha_binary(buf: &mut [u8], w: u32, h: u32, threshold: u8, dither: b
             let o = ((y * w + x) * 4) as usize;
             let a = buf[o + 3] as f32;
             let cut = if dither {
-                (BAYER8[(y % 8) as usize][(x % 8) as usize] / 64.0) * 255.0
+                // 抖动模式下阈值仍然生效：以阈值为中心做 ±50% 的点阵偏移。
+                t * (0.5 + BAYER8[(y % 8) as usize][(x % 8) as usize] / 64.0)
             } else {
                 t
             };

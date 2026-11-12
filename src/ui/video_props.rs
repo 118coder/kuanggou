@@ -204,19 +204,23 @@ fn format_advanced(app: &mut App, ui: &mut egui::Ui) {
     if fmt.is_gif() {
         section(ui, "GIF ADVANCED", "GIF 高级选项", None);
         let cur = app.video.s.gif_limit_mb;
-        let sel = SIZE_LIMITS.iter().find(|(k, _)| k.parse::<f32>().unwrap_or(-1.0) == cur)
-            .map(|(_, l)| *l).unwrap_or("自定义");
+        let matched = SIZE_LIMITS.iter().any(|(k, _)| k.parse::<f32>().ok() == Some(cur));
+        let sel = SIZE_LIMITS.iter().find(|(k, _)| k.parse::<f32>().ok() == Some(cur))
+            .map(|(_, l)| *l).unwrap_or("自定义大小");
         egui::ComboBox::from_id_salt("v_gif_limit")
             .selected_text(format!("输出大小上限：{sel}"))
             .width(ui.available_width() - 4.0)
             .show_ui(ui, |ui| {
                 for (k, l) in SIZE_LIMITS {
                     if *k == "custom" {
-                        if ui.selectable_label(false, "自定义（下方输入）").clicked() {
+                        if ui.selectable_label(!matched, "自定义（下方输入）").clicked() {
                             app.video.s.gif_limit_mb = 6.0;
                         }
-                    } else if ui.selectable_label(false, *l).clicked() {
-                        app.video.s.gif_limit_mb = k.parse::<f32>().unwrap_or(0.0);
+                    } else {
+                        let v = k.parse::<f32>().unwrap_or(0.0);
+                        if ui.selectable_label(v == cur, *l).clicked() {
+                            app.video.s.gif_limit_mb = v;
+                        }
                     }
                 }
             });

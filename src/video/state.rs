@@ -389,8 +389,19 @@ impl VideoState {
                 Err(e) => { let _ = tx.send(PreviewMsg::Failed(e)); ctx2.request_repaint(); return; }
             };
             let mut idx = 0u64;
+            let clock = std::time::Instant::now();
             loop {
                 if cancel.load(Ordering::Relaxed) { break; }
+                // 播放时按墙钟节流，避免「解码多快就播多快」变成快进。
+                if play_after {
+                    let due = idx as f64 / fps.max(1.0);
+                    loop {
+                        let lag = due - clock.elapsed().as_secs_f64();
+                        if lag <= 0.0 || cancel.load(Ordering::Relaxed) { break; }
+                        thread::sleep(std::time::Duration::from_millis((lag * 1000.0).min(20.0) as u64));
+                    }
+                    if cancel.load(Ordering::Relaxed) { break; }
+                }
                 match rd.next() {
                     Some(buf) => {
                         let tt = t + idx as f64 / fps.max(1.0);

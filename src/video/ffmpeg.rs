@@ -176,8 +176,16 @@ pub fn probe(tools: &Tools, path: &Path) -> Result<VideoInfo, String> {
     let mut w = 0u32;
     let mut h = 0u32;
     let mut fps = 25.0f64;
+    let mut duration = 0.0f64;
+    let mut codec = String::from("视频");
     for line in text.lines() {
         if line.contains("Video:") {
+            // 形如 `Stream #0:0: Video: h264, yuv420p, 1920x1080, 30 fps`
+            if let Some(p) = line.find("Video:") {
+                let name = line[p + 6..].trim_start();
+                let name = name.split([',', ' ', '(']).next().unwrap_or("").trim();
+                if !name.is_empty() { codec = name.to_string(); }
+            }
             for part in line.split([',', ' ']) {
                 if let Some((a, b)) = part.split_once('x') {
                     if let (Ok(ww), Ok(hh)) = (a.parse::<u32>(), b.parse::<u32>()) {
@@ -189,22 +197,24 @@ pub fn probe(tools: &Tools, path: &Path) -> Result<VideoInfo, String> {
                 }
             }
         }
+        // `Duration: 00:00:12.34, start: ...` —— 必须存到循环外，流信息在其后一行。
         if let Some(pos) = line.find("Duration:") {
             let d = &line[pos + 9..];
             let t: Vec<&str> = d.trim().split(':').collect();
             if t.len() == 3 {
-                let hh = t[0].parse::<f64>().unwrap_or(0.0);
-                let mm = t[1].parse::<f64>().unwrap_or(0.0);
-                let ss = t[2].split(',').next().unwrap_or("0").parse::<f64>().unwrap_or(0.0);
-                let duration = hh * 3600.0 + mm * 60.0 + ss;
-                if w > 0 && duration > 0.0 {
-                    return Ok(VideoInfo {
-                        path: path.into(), w, h, fps: fps.clamp(1.0, 240.0), duration,
-                        frames: (duration * fps) as u64, codec: "视频".into(), bytes,
-                    });
-                }
+                let hh = t[0].trim().parse::<f64>().unwrap_or(0.0);
+                let mm = t[1].trim().parse::<f64>().unwrap_or(0.0);
+                let ss = t[2].split(',').next().unwrap_or("0").trim().parse::<f64>().unwrap_or(0.0);
+                duration = hh * 3600.0 + mm * 60.0 + ss;
             }
         }
+    }
+    if w > 0 && h > 0 {
+        let duration = duration.max(0.01);
+        return Ok(VideoInfo {
+            path: path.into(), w, h, fps: fps.clamp(1.0, 240.0), duration,
+            frames: (duration * fps) as u64, codec, bytes,
+        });
     }
     Err("无法解析视频信息，确认文件可播放且 FFmpeg 可用".into())
 }
