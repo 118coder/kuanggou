@@ -39,11 +39,27 @@ impl App {
         ui.scope_builder(
             egui::UiBuilder::new().max_rect(rect.shrink2(vec2(14.0, 0.0))).layout(egui::Layout::left_to_right(egui::Align::Center)),
             |ui| {
+                // 视频工作区没有「脏标记」概念，状态由导出 / 估算 / 播放三个开关决定。
+                let (busy, label) = if self.workspace == Workspace::Video {
+                    if self.video.exporting {
+                        (true, "导出中")
+                    } else if self.video.sampling {
+                        (true, "估算中")
+                    } else if self.video.playing {
+                        (true, "播放中")
+                    } else {
+                        (false, "就绪")
+                    }
+                } else if self.dirty {
+                    (true, "处理中")
+                } else {
+                    (false, "就绪")
+                };
                 let (dot, _) = ui.allocate_exact_size(vec2(4.0, 4.0), Sense::hover());
-                ui.painter().rect_filled(dot, 0.0, if self.dirty { C_SIGNAL } else { C_INK3_DARK });
+                ui.painter().rect_filled(dot, 0.0, if busy { C_SIGNAL } else { C_INK3_DARK });
                 ui.add_space(7.0);
                 ui.label(
-                    egui::RichText::new(if self.dirty { "处理中" } else { "就绪" })
+                    egui::RichText::new(label)
                         .size(11.5)
                         .strong()
                         .color(C_BAR_TXT),

@@ -151,10 +151,20 @@ impl App {
             self.status = if self.workspace == Workspace::Video { "视频工作区" } else { "图片工作区" }.into();
             return;
         }
-        // 视频工作区：空格播放 / 暂停，其余图片快捷键一律不接管
+        // 视频工作区：空格播放 / 暂停，M 精确预估，E 导出；其余图片快捷键一律不接管
         if self.workspace == Workspace::Video {
             if ctx.input(|i| i.key_pressed(Key::Space)) {
                 self.video.toggle_play(ctx);
+            }
+            if ctx.input(|i| i.key_pressed(Key::M)) {
+                self.video.request_measure(ctx);
+            }
+            if ctx.input(|i| i.key_pressed(Key::E)) {
+                if self.video.exporting {
+                    self.video.cancel_export();
+                } else {
+                    self.video.start_export(ctx);
+                }
             }
             return;
         }
