@@ -43,6 +43,9 @@ impl App {
                 sa = sa.vertical_scroll_offset(0.0);
             }
             sa.show(ui, |ui| {
+                    // 纵向滚动条是浮层，会盖住滑杆右端：先按条宽收窄内容区。
+                    let bar = ui.spacing().scroll.bar_width + 4.0;
+                    ui.set_max_width((ui.available_width() - bar).max(80.0));
                     self.props_head(ui);
                     match mode {
                         Mode::DualBg => self.dualbg_params(ui),
@@ -546,10 +549,6 @@ impl App {
     /// 专用于黑底光效、烟雾、火花；实拍黑底人像请改用色键或双底合成。
     pub(crate) fn unmult_params(&mut self, ui: &mut egui::Ui) {
         section(ui, "UNMULT", "去黑底参数", Some("AE Unmult 同款".into()));
-        ui.label(
-            egui::RichText::new("黑底光效 / 烟雾 / 火花专用：按亮度反解透明度，并还原被黑色压暗的原色。")
-                .size(10.5).color(C_INK2),
-        );
         let s = slider_row(ui, "黑场", &mut self.un_black, 0.0..=64.0, 0.0, 1.0, 0);
         self.slider_changed(&s);
         let s = slider_row(ui, "白场", &mut self.un_white, 128.0..=255.0, 255.0, 1.0, 0);

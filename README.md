@@ -14,7 +14,8 @@ FrameForge / frameronin「抠图去背」的 **Rust 原生独立版**。单文�
 ## 使用
 
 双击 `框构.exe`。载入图片：**拖进窗口直接替换主图**（双底合成模式先拖两张自动填槽）/ `Ctrl+V` / 顶部「打开」/ 命令行
-`框构.exe 图片.png [模式] [底色]`，模式 `auto|green|blue|white|corner|custom|dual|dualbg|fx`，底色 `white|black|green|blue|magenta`。
+`框构.exe 图片.png [模式] [底色]`，模式 `auto|green|blue|white|corner|custom|dual|dualbg|fx|unmult`，底色 `white|black|green|blue|magenta`。
+命令行给视频文件（`框构.exe 视频.mp4`）会直接进视频工作区，也可以把视频拖到 exe 图标上。
 
 ## 两个工作区
 
@@ -94,6 +95,9 @@ FrameForge / frameronin「抠图去背」的 **Rust 原生独立版**。单文�
 | 空格 | 速览原图（窗口失焦自动释放） |
 | `Ctrl+Z / Ctrl+Y` | 参数撤销 / 恢复 |
 | 最近文件 | 悬停出 ×，可移除记录（不删文件） |
+| `W` | 切换 图片 / 视频 工作区 |
+| `0` | 图片模式第 10 项：去黑底 Unmult |
+| 视频：空格 / `M` / `E` | 播放暂停 / 精确预估 / 导出 |
 
 其余快捷键见 `F1`。拖入图片替换主图；双底合成一次拖两张自动填槽；拖入视频自动切到视频工作区。
 

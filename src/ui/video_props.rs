@@ -23,6 +23,9 @@ pub fn props(app: &mut App, ui: &mut egui::Ui, rect: Rect) {
                 .auto_shrink([false, false])
                 .scroll_bar_visibility(egui::scroll_area::ScrollBarVisibility::AlwaysVisible)
                 .show(ui, |ui| {
+                    // 纵向滚动条是浮层，会盖住滑杆右端：先按条宽收窄内容区。
+                    let bar = ui.spacing().scroll.bar_width + 4.0;
+                    ui.set_max_width((ui.available_width() - bar).max(80.0));
                     head(app, ui);
                     keying(app, ui);
                     unmult(app, ui);
