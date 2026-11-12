@@ -6,7 +6,8 @@ FrameForge / frameronin「抠图去背」的 **Rust 原生独立版**。单文�
 半透明算法移植自 frameronin 线上版（逆向其前端 bundle 的 `wt` 函数）；色键/双背景对照其开源仓库。
 智能去底内核为本项目自研的「底色场 + 逐点反解」（说明见 `tools/algo-notes.md`）。
 
-![测试](https://img.shields.io/badge/单测-28通过-b64a2e)
+![测试](https://img.shields.io/badge/单测-30通过-b64a2e)
+[仓库](https://github.com/118coder/kuanggou) · [最新版本](https://github.com/118coder/kuanggou/releases/latest)
 
 ![界面](docs/screenshot.png)
 
