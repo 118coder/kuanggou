@@ -73,7 +73,10 @@
 
 ## 7. 其他
 
-- **图标**：`assets/app_256.png` + `assets/app.ico`（纸白板 + 右下黄切角，整数顶点、无圆角）；`main.rs::app_icon()` 经 `ViewportBuilder::with_icon` 设置任务栏/窗口图标。
+- **图标**：`assets/app_256.png` + `assets/app.ico`（纸白板 + 右下黄切角，整数顶点、无圆角）。
+  - 运行时窗口/任务栏：`main.rs::app_icon()` → `ViewportBuilder::with_icon`
+  - **exe 文件图标**：`build.rs` 调 mingw `windres` 把 `assets/app.rc`（GBK 编码）编成 COFF 资源对象再链接进 exe，含 `1 ICON` + `VERSIONINFO`（产品「框构」/ 版本 / 描述）。资源管理器、桌面快捷方式显示的就是这个图标。
+  - windres 对 UTF-8 中文会生成坏块（版本信息读不出），所以 rc 用 **GBK + `--codepage=936`**。
 - 自绘标题栏保持拖拽/双击最大化/最小化/关闭；三色条保留（技能规定屏幕开头）。
 - 持久化新增：`compare / split_x / props_w / key_green / key_blue`（旧配置缺字段自动走默认）。
 
@@ -86,7 +89,7 @@
 ## 9. 仓库与自动更新
 
 - 源码仓库：**https://github.com/118coder/kuanggou**（公开，只放源码 + 文档 + 构建脚本，二进制走 Releases）
-- 发行：tag `v1.1.0`，资产固定命名 `kuanggou.exe`（`build.ps1` 生成的 `dist/kuanggou.exe`）
+- 发行：最新 tag `v1.1.1`（修复 exe 图标），资产固定命名 `kuanggou.exe`（`build.ps1` 生成的 `dist/kuanggou.exe`）
 - 推送方式：`github.com:443` 直连被墙，改用 **GitHub Git Data API**（blobs → tree → commit → ref）推送；发行包用 uploads.github.com 上传
 - 应用内自动更新（`src/update.rs`）：
   - 启动时后台查 `releases/latest`（ureq + rustls，不阻塞 UI）；有新版 → 状态栏黄色「新版本 vX.Y.Z」
