@@ -317,8 +317,9 @@ pub fn encode_cmd(tools: &Tools, out: &Path, spec: &OutputSpec, s: &VideoSetting
             c.args(["-c:v", "qtrle", "-pix_fmt", "argb"]);
         }
         OutFormat::Apng => {
+            // apng 复用器只接受 apng 编码器（用 png 会报 "supports only codec apng"）。
             let plays = if s.loop_count == 0 { "0".to_string() } else { s.loop_count.to_string() };
-            c.args(["-f", "apng", "-plays", &plays, "-c:v", "png", "-pix_fmt", "rgba"]);
+            c.args(["-c:v", "apng", "-pix_fmt", "rgba", "-plays", &plays, "-f", "apng"]);
         }
         OutFormat::Mp4Flat => {
             c.args(["-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", &crf,
