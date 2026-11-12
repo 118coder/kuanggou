@@ -79,16 +79,29 @@
 
 ## 8. 验证
 
-- `cargo test`：**28 passed / 0 failed**（新增自定义键色用例；算法代理新增底色场、渐变、暗角、投影、压边等合成真值用例）
+- `cargo test`：**29 passed / 0 failed / 3 ignored**（新增自定义键色用例；算法代理新增底色场、渐变、暗角、投影、压边等合成真值用例）
 - 截图验收（1280×820 与 940×640 两档）：常态 / 对比 / 空状态 / 窄窗 / 双底 / 自动去底 / 不纯绿底
 - 已知限制：径向暗角内部约 2% 底漏；双色底返回 None（提示改色键/手动取色）；±20 级噪声下仍有 5–13% 底漏
 
-## 9. 构建与清理
+## 9. 仓库与自动更新
+
+- 源码仓库：**https://github.com/118coder/kuanggou**（公开，只放源码 + 文档 + 构建脚本，二进制走 Releases）
+- 发行：tag `v1.1.0`，资产固定命名 `kuanggou.exe`（`build.ps1` 生成的 `dist/kuanggou.exe`）
+- 推送方式：`github.com:443` 直连被墙，改用 **GitHub Git Data API**（blobs → tree → commit → ref）推送；发行包用 uploads.github.com 上传
+- 应用内自动更新（`src/update.rs`）：
+  - 启动时后台查 `releases/latest`（ureq + rustls，不阻塞 UI）；有新版 → 状态栏黄色「新版本 vX.Y.Z」
+  - 点开弹窗看说明 →「下载并安装」→ 下载到 `%TEMP%\kuanggou_update` → 校验大小与 `MZ` 头 → 写批处理，退出后备份旧 exe、覆盖、重启；失败回滚
+  - 「以后再说」/「忽略此版本」（忽略记在持久化里，同版本不再提示）
+  - 不强制、不后台静默安装；手动「检查更新」在状态栏
+- 已知：本机 `github.com` 页面直连不稳定，但 `api.github.com` 与 releases 下载均可用
+
+## 10. 构建与清理
 
 ```powershell
 cargo build --release            # 约 1m40s
 copy target\release\cutout_tool.exe 框构.exe
 ```
 
-交付后 `target/`、`target-algo/`、`tools/` 下的截图与测试图已删；重建需重新 `cargo build --release`。
+交付后 `target/`、`target-algo/` 已 `cargo clean`；重建需 `cargo build --release`（约 2 分钟，含依赖）。
+`build.ps1` 一步生成 `dist\kuanggou.exe` 与根目录 `框构.exe`。
 界面源码：`src/main.rs`（约 3400 行）· 算法与测试：`src/algo.rs`（约 2700 行）· 算法说明：`tools/algo-notes.md`。

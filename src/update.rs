@@ -181,3 +181,28 @@ pub fn apply(new_exe: &std::path::Path) -> Result<(), String> {
         Err("仅支持 Windows 自动替换".into())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn version_compare() {
+        assert!(is_newer("v99.0.0"));
+        assert!(!is_newer(current_version()));
+        assert!(!is_newer("0.9.9"));
+    }
+
+    #[test]
+    #[ignore]
+    fn live_api_check() {
+        let (tx, rx) = std::sync::mpsc::channel();
+        check(tx);
+        match rx.recv_timeout(Duration::from_secs(45)) {
+            Ok(Msg::Found(i)) => println!("FOUND {} {}", i.version, i.url),
+            Ok(Msg::NoUpdate(v)) => println!("LATEST {v}"),
+            Ok(Msg::Failed(e)) => println!("FAILED {e}"),
+            _ => println!("TIMEOUT"),
+        }
+    }
+}
