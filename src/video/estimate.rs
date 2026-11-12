@@ -43,7 +43,8 @@ pub fn estimate_gif(spec: &OutputSpec, colors: u16, dither: bool, m: Option<&Mea
             let ck = (colors as f64 / mm.colors.max(1) as f64).clamp(0.55, 1.6).powf(0.35);
             (base * ck, "样本试编码", 0.86, 1.18)
         }
-        None => (0.20, "经验模型", 0.62, 1.55),
+        // 经验值：GIF 每像素每帧约 0.1 字节（实测 480p 素材 0.02–0.15，随画面复杂度浮动）。
+        None => (0.10, "经验模型", 0.45, 1.85),
     };
     let dither_k = if dither { 1.10 } else { 1.0 };
     let color_k = 0.60 + (colors as f64 / 256.0) * 0.50;
