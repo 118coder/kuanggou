@@ -1,0 +1,48 @@
+name: build-windows
+
+# 云端编译：本机不做 release 打包，统一由 GitHub Actions 出 exe。
+# 触发方式：推送到 main 的源码变更，或在 Actions 页面手动 Run workflow。
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "assets/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "build.rs"
+      - ".github/workflows/build-windows.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: 检出源码
+        uses: actions/checkout@v4
+
+      - name: 安装 Rust 工具链
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: 缓存依赖
+        uses: Swatinem/rust-cache@v2
+
+      # build.rs 用 windres 把图标/版本写进 exe 资源；缺失时只会降级为警告。
+      - name: 安装 windres（图标资源，可选）
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          choco install mingw --no-progress -y
+          if (Test-Path "C:\ProgramData\chocolatey\bin\x86_64-w64-mingw32-windres.exe") {
+            Copy-Item "C:\ProgramData\chocolatey\bin\x86_64-w64-mingw32-windres.exe" "C:\ProgramData\chocolatey\bin\windres.exe" -Force
+          }
+
+      - name: 编译 release
+        run: cargo build --release
+
+      - name: 上传产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: cutout_tool-windows-x64
+          path: target/release/cutout_tool.exe
+          if-no-files-found: error
