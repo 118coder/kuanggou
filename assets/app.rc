@@ -1,0 +1,30 @@
+// GBK (cp936) encoded: windres --codepage=936
+1 ICON "app.ico"
+
+1 VERSIONINFO
+ FILEVERSION 1,1,1,0
+ PRODUCTVERSION 1,1,1,0
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080404B0"
+        BEGIN
+            VALUE "CompanyName", "118coder"
+            VALUE "FileDescription", "框构 · 智能抠图去背"
+            VALUE "FileVersion", "1.1.1"
+            VALUE "InternalName", "kuanggou"
+            VALUE "OriginalFilename", "kuanggou.exe"
+            VALUE "ProductName", "框构"
+            VALUE "ProductVersion", "1.1.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 1200
+    END
+END

@@ -1,6 +1,6 @@
 [package]
 name = "cutout_tool"
-version = "1.1.0"
+version = "1.1.1"
 edition = "2024"
 description = "抠图去背 —— FrameForge 抠图算法的 Rust 原生独立版（绿幕/蓝幕/白底/连通域/自定义色/双色键/双背景差分）"
 
