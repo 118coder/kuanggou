@@ -1,0 +1,9 @@
+/target
+/tools/*.png
+/tools/last.pid
+/dist
+/*.exe
+/*.exe.old
+/tools/*.ps1
+/tools/*.py
+/deepseek_html_*.html

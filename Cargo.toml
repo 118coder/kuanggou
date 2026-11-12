@@ -1,0 +1,20 @@
+[package]
+name = "cutout_tool"
+version = "1.1.0"
+edition = "2024"
+description = "抠图去背 —— FrameForge 抠图算法的 Rust 原生独立版（绿幕/蓝幕/白底/连通域/自定义色/双色键/双背景差分）"
+
+[dependencies]
+arboard = "3.7.0"
+eframe = { version = "0.37.0", features = ["persistence"] }
+image = "0.25.10"
+rfd = "0.18.0"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+ureq = { version = "2.12", default-features = false, features = ["native-tls", "json"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = true
