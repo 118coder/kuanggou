@@ -277,7 +277,14 @@ impl App {
             app.fx_density = preset.density;
             app.fx_despill = preset.despill;
         }
-        if let Some(p) = arg_img {
+        // 命令行给的是视频 / 动图：直接进视频工作区，不走图片解码。
+        let arg_is_video = arg_img.as_deref().map(|p| crate::app::input::is_video_file(Path::new(p))).unwrap_or(false);
+        if arg_is_video {
+            app.workspace = Workspace::Video;
+            if let Some(p) = arg_img.clone() {
+                app.video.load_video(PathBuf::from(p), &cc.egui_ctx);
+            }
+        } else if let Some(p) = arg_img {
             match std::fs::read(&p).map_err(|e| e.to_string()).and_then(|b| Img::from_bytes(&b)) {
                 Ok(img) => {
                     if app.mode == Mode::DualBg {

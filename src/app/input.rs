@@ -37,9 +37,17 @@ impl App {
                     continue;
                 }
                 self.drop_paths.push(p.clone());
-                // 视频工作区：拖进视频文件直接交给视频状态，不与图片工作区串味
-                if self.workspace == Workspace::Video && is_video_file(&p) {
+                // 视频 / 动图一律进视频工作区：拖进来即自动切过去，避免误当图片解码。
+                if is_video_file(&p) {
+                    if self.workspace != Workspace::Video {
+                        self.workspace = Workspace::Video;
+                    }
                     self.video.load_video(p.clone(), ctx);
+                    continue;
+                }
+                // 视频工作区不接管图片，避免把整段视频的时间轴搞乱。
+                if self.workspace == Workspace::Video {
+                    self.toast("视频工作区只接收视频 / 动图，图片请切回「图片抠图」", true);
                     continue;
                 }
                 match f.bytes() {
@@ -263,7 +271,7 @@ impl App {
 }
 
 /// 常见视频 / 动图扩展名（用于拖放时把素材路由到视频工作区）。
-fn is_video_file(p: &Path) -> bool {
+pub(crate) fn is_video_file(p: &Path) -> bool {
     let Some(ext) = p.extension().and_then(|e| e.to_str()) else { return false };
     matches!(
         ext.to_ascii_lowercase().as_str(),
